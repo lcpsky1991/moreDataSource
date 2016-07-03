@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans    
+    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd    
+    http://www.springframework.org/schema/jdbc 
+    http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd 
+    http://www.springframework.org/schema/tx    
+    http://www.springframework.org/schema/tx/spring-tx-4.0.xsd   
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-4.0.xsd  
+    http://www.springframework.org/schema/context   
+    http://www.springframework.org/schema/context/spring-context-4.0.xsd 
+    http://www.springframework.org/schema/mvc   
+    http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd 
+    http://www.springframework.org/schema/task
+    http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	<context:component-scan base-package="com.wangguan" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" />
+	</context:component-scan>
+	
+	<!-- 启动包扫描功能，以便注册带有@Controller、@Service、@repository、@Component等注解的类成为spring的bean 
+	<context:component-scan base-package="com.hello">
+		<context:include-filter type="regex" expression="com.hello.controller.*" />
+		<context:include-filter type="regex" expression="com.hello.common.captcha.*" />
+		<context:include-filter type="regex" expression="com.hello.service.*" />
+		<context:include-filter type="regex" expression="com.hello.dao.*" />
+	</context:component-scan>
+    -->
+    
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<!--默认的mvc注解映射的支持 -->
+    <!--  
+    	<mvc:annotation-driven />的具体说明：
+		<mvc:annotation-driven /> 是一种简写形式，完全可以手动配置替代这种简写形式，简写形式可以让初学都快速应用默认配置方案。
+		<mvc:annotation-driven /> 会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter 两个bean,是spring MVC为@Controllers分发请求所必须的。
+		并提供了：数据绑定支持，@NumberFormatannotation支持，@DateTimeFormat支持，@Valid支持，读写XML的支持（JAXB），读写JSON的支持（Jackson）。
+    -->
+	<mvc:annotation-driven />
+	
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	<mvc:resources mapping="/css/**" location="/css/" />
+	<mvc:resources mapping="/images/**" location="/images/" />
+	<mvc:resources mapping="/js/**" location="/js/" />
+
+	<!-- Jackson转换器 -->
+	<bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+	
+	<!-- fastjson转换器 -->
+	<bean id="fastJsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter" />
+	
+	<!-- 配置请求与业务控制器的调用关系 
+	<bean id="handlerMapping" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
+    -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"> 
+	    <property name="messageConverters">
+	       <list>
+	          <!-- json转换器 -->
+	          <ref bean="fastJsonHttpMessageConverter" />
+	       </list>
+	    </property>
+	 </bean>
+	
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<!-- 配置转发的页面 -->
+    <!-- 
+		viewResolver组件负责转发请求，它会将请求转发给如下的页面：
+		prefix_value(前缀) + returningString(控制器返回字符串) + suffix_value(后缀)
+		对于HelloController而言，该页面是/WEB-INF/view/hello.jsp
+	-->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/view/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<!-- 上传文件 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	    <!-- 上传文件大小限制为31M，31*1024*1024 -->
+	    <property name="maxUploadSize" value="32505856" />
+	    <property name="maxInMemorySize" value="4096" />
+	    <property name="defaultEncoding" value="utf-8" />
+	</bean>
+	
+	<!-- SpringMVC在超出上传文件限制时，会抛出org.springframework.web.multipart.MaxUploadSizeExceededException -->
+	<!-- 该异常是SpringMVC在检查上传的文件信息时抛出来的，而且此时还没有进入到Controller方法中 -->
+	<!-- 
+	<bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				遇到MaxUploadSizeExceededException异常时，自动跳转到/WEB-INF/jsp/error_fileupload.jsp页面
+				<prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">common/error_fileupload</prop>
+			</props>
+		</property>
+	</bean> 
+	-->
+	
+</beans>

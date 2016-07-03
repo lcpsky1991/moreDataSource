@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<settings>
+		<!-- 配置全局的映射器是否启用/禁用缓存 -->
+		<setting name="cacheEnabled" value="true"/>
+		
+		<!-- 配置默认的执行器。SIMPLE执行器没有什么特别之处。REUSE执行器重用预处理语句。BATCH执行器重用语句和批更新 -->
+		<setting name="defaultExecutorType" value="REUSE"/>
+		
+		<!-- 全局启用/禁止延迟加载。当禁用时，所有关联对象都会及时加载。 -->
+		<setting name="lazyLoadingEnabled" value="true"/>
+		
+		<!-- 设置超时时间，它决定驱动等待一个数据库响应时间。 -->
+		<setting name="defaultStatementTimeout" value="25000"/>
+	</settings>
+	
+	<!-- 别名 
+	<typeAliases>
+		<package name="com.wangguan.model.back" />
+	</typeAliases>
+	-->
+	
+	<!-- 加载Mapper映射文件 
+	<mappers>
+		<mapper resource="mapper/pictureUrlMapper.xml"/>
+		<mapper resource="mapper/roomMapper.xml"/>
+	</mappers>
+	-->
+	
+	<!-- 配置分页插件 -->
+	<plugins>
+		<plugin interceptor="com.github.pagehelper.PageHelper">
+			<!-- 设置数据库类型 Oracle,Mysql,MariaDB,SQLite,Hsqldb,PostgreSQL六种数据库 -->        
+        	<property name="dialect" value="mysql"/>
+		</plugin>
+	</plugins>
+	
+</configuration>
